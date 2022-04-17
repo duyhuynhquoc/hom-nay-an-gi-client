@@ -1,0 +1,24 @@
+<div class="food-item">
+  <p-card [header]="food.foodName" [style]="{ width: '360px' }">
+    <ng-template pTemplate="header">
+      <div class="image-container">
+        <img
+          [src]="food.images[0]"
+          [alt]="food.foodName"
+          *ngIf="food.images.length >= 1"
+        />
+        <img
+          src="https://cdn.dribbble.com/users/1044993/screenshots/15079662/media/bddc27ef9e0a818af1be0884cd685bac.png?compress=1&resize=400x300"
+          [alt]="food.foodName"
+          *ngIf="food.images.length < 1"
+        />
+      </div>
+    </ng-template>
+    <p>{{ food.averagePrice }}</p>
+    <p>{{ food.addresses[0] }}</p>
+    <p>{{ food.reviews[0] }}</p>
+    <p *ngFor="let tag of food.tags">{{ tag }}</p>
+
+    <a href="#">Xem thêm...</a>
+  </p-card>
+</div>

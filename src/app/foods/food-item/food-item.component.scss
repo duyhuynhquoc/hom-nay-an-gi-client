@@ -1,0 +1,14 @@
+.food-item {
+  display: inline-block;
+  max-height: 500px;
+
+  .image-container {
+    height: 200px;
+  }
+}
+
+img {
+  border-radius: 6px 6px 0 0;
+  max-height: 200px;
+  object-fit: cover;
+}
