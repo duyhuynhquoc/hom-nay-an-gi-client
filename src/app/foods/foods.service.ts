@@ -28,4 +28,9 @@ export class FoodsService {
   getFoods() {
     return this.foods.slice();
   }
+
+  addFood(f: Food) {
+    this.foods.push(f);
+    this.foodsChanged.next(this.getFoods());
+  }
 }

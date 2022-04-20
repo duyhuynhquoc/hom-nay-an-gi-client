@@ -15,7 +15,10 @@
       </div>
     </ng-template>
     <p>{{ food.averagePrice }}</p>
-    <p>{{ food.addresses[0] }}</p>
+    <p *ngIf="food.addresses.length > 0">
+      {{ food.addresses[0].address }}, {{ food.addresses[0].ward.name }},
+      {{ food.addresses[0].district.name }}, {{ food.addresses[0].city.name }}
+    </p>
     <p>{{ food.reviews[0] }}</p>
     <p *ngFor="let tag of food.tags">{{ tag }}</p>
 

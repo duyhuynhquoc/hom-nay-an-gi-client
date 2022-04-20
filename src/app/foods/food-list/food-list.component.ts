@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Food } from '../food.model';
 import { FoodsService } from '../foods.service';
 
@@ -10,7 +11,11 @@ import { FoodsService } from '../foods.service';
 export class FoodListComponent implements OnInit {
   foods: Food[] = [];
 
-  constructor(private foodService: FoodsService) {}
+  constructor(
+    private foodService: FoodsService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.foodService.foodsChanged.subscribe((foods) => {
@@ -21,5 +26,7 @@ export class FoodListComponent implements OnInit {
     console.log(this.foods);
   }
 
-  onAddFood() {}
+  onAddFood() {
+    this.router.navigate(['new'], { relativeTo: this.route });
+  }
 }

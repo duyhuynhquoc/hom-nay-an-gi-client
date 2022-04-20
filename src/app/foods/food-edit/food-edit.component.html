@@ -1,1 +1,150 @@
-<p>food-edit works!</p>
+<h1>Thêm món mới</h1>
+<form [formGroup]="foodForm" (ngSubmit)="onSubmit()">
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Tên món</mat-label>
+    <input
+      matInput
+      placeholder=""
+      formControlName="foodName"
+      autocomplete="off"
+    />
+  </mat-form-field>
+
+  <br />
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Giá trung bình</mat-label>
+    <input matInput placeholder="" value="" formControlName="averagePrice" />
+  </mat-form-field>
+
+  <br />
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Địa chỉ</mat-label>
+    <input
+      matInput
+      placeholder=""
+      [formControl]="addressCtrl"
+      autocomplete="off"
+    />
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Phường/Xã</mat-label>
+    <input
+      id="ward-input"
+      type="text"
+      matInput
+      [formControl]="wardCtrl"
+      [matAutocomplete]="ward"
+    />
+    <mat-autocomplete
+      #ward="matAutocomplete"
+      [displayWith]="displayFn"
+      (optionSelected)="onWardSelected($event.option.value)"
+    >
+      <mat-option *ngFor="let option of filterWards | async" [value]="option">
+        {{ option.name }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Quận/Huyện</mat-label>
+    <input
+      id="district-input"
+      type="text"
+      matInput
+      [formControl]="districtCtrl"
+      [matAutocomplete]="district"
+    />
+    <mat-autocomplete
+      #district="matAutocomplete"
+      [displayWith]="displayFn"
+      (optionSelected)="onDistrictSelected($event.option.value)"
+    >
+      <mat-option
+        *ngFor="let option of filterDistricts | async"
+        [value]="option"
+      >
+        {{ option.name }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Tỉnh/Thành phố</mat-label>
+    <input
+      id="city-input"
+      type="text"
+      matInput
+      [formControl]="cityCtrl"
+      [matAutocomplete]="city"
+    />
+    <mat-autocomplete
+      #city="matAutocomplete"
+      [displayWith]="displayFn"
+      (optionSelected)="onCitySelected($event.option.value)"
+    >
+      <mat-option *ngFor="let option of filterCities | async" [value]="option">
+        {{ option.name }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <br />
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Link Review</mat-label>
+    <input
+      matInput
+      placeholder=""
+      [formControl]="reviewCtrl"
+      autocomplete="off"
+    />
+  </mat-form-field>
+
+  <br />
+
+  <!-- [TODO] Image Upload + Image pasting area -->
+
+  <mat-form-field class="example-chip-list" appearance="fill">
+    <mat-label>Favorite tags</mat-label>
+    <mat-chip-list #chipList aria-label="tag selection">
+      <mat-chip *ngFor="let tag of tags" (removed)="remove(tag)">
+        {{ tag }}
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip>
+      <input
+        placeholder="New tag..."
+        #tagInput
+        [formControl]="tagCtrl"
+        [matAutocomplete]="auto"
+        [matChipInputFor]="chipList"
+        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+        (matChipInputTokenEnd)="add($event)"
+      />
+    </mat-chip-list>
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      (optionSelected)="selected($event)"
+    >
+      <mat-option *ngFor="let tag of filteredTags | async" [value]="tag">
+        {{ tag }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <br />
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Ghi chú</mat-label>
+    <textarea matInput placeholder="" formControlName="note"></textarea>
+  </mat-form-field>
+
+  <br />
+
+  <button pButton type="submit" label="Thêm"></button>
+</form>
