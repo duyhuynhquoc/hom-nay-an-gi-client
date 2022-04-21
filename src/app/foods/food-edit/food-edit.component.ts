@@ -23,37 +23,40 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./food-edit.component.scss'],
 })
 export class FoodEditComponent implements OnInit, OnDestroy {
-  addressCtrl: FormControl = new FormControl(null);
+  addressControls: FormControl[] = [];
 
-  wardCtrl: FormControl = new FormControl(null);
-  selectedWard: any;
+  wardControls: FormControl[] = [];
+  selectedWard: any[] = [];
   wards: any[] = [];
-  filterWards: Observable<any[]> = new Observable();
+  filterWards: Observable<any[]>[] = [];
 
-  districtCtrl: FormControl = new FormControl(null);
-  selectedDistrict: any;
+  districtControls: FormControl[] = [];
+  selectedDistrict: any[] = [];
   districts: any[] = [];
-  filterDistricts: Observable<any[]> = new Observable();
+  filterDistricts: Observable<any[]>[] = [];
 
-  cityCtrl: FormControl = new FormControl(null);
-  selectedCity: any;
+  cityControls: FormControl[] = [];
+  selectedCity: any[] = [];
   cities: any[] = [];
-  filterCities: Observable<any[]> = new Observable();
+  // filterCitiesArr: Observable<any[]>[] = [];
+  filterCities: Observable<any[]>[] = [];
 
   reviewCtrl: FormControl = new FormControl(null);
 
   @ViewChild('tagInput', { static: false })
   tagInput: ElementRef<HTMLInputElement> = {} as ElementRef;
   separatorKeysCodes: number[] = [ENTER, COMMA];
+
+  // [TODO] Fetch real tags
   allTags: string[] = ['mon nuong', 'banh trang'];
   tags: string[] = [];
   tagCtrl: FormControl = new FormControl(null);
   filteredTags: Observable<string[]> = new Observable();
 
   foodForm: FormGroup = new FormGroup({
-    foodName: new FormControl(null),
-    averagePrice: new FormControl(null),
-    note: new FormControl(null),
+    foodName: new FormControl(''),
+    averagePrice: new FormControl(''),
+    note: new FormControl(''),
     addresses: new FormArray([]),
     reviews: new FormArray([]),
     images: new FormArray([]),
@@ -77,23 +80,12 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.bService.getCities().subscribe((data) => {
       this.cities = data;
-
-      this.filterCities = this.cityCtrl.valueChanges.pipe(
-        startWith(''),
-        map((value) => {
-          return typeof value === 'string' ? value : value.name;
-        }),
-        map((name) => (name ? this._cityFilter(name) : this.cities.slice()))
-      );
     });
-
-    this.onAddAddress();
-    this.onAddReview();
   }
 
   ngOnDestroy(): void {}
 
-  addressControls() {
+  addressGroupControls() {
     return (<FormArray>this.foodForm.get('addresses')).controls;
   }
 
@@ -102,18 +94,37 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   }
 
   onAddAddress() {
+    let addressCtrl: FormControl = new FormControl('');
+    let wardCtrl: FormControl = new FormControl('');
+    let districtCtrl: FormControl = new FormControl('');
+    let cityCtrl: FormControl = new FormControl('');
+
+    this.addressControls.push(addressCtrl);
+    this.wardControls.push(wardCtrl);
+    this.districtControls.push(districtCtrl);
+    this.cityControls.push(cityCtrl);
+
+    this.filterCities[(<FormArray>this.foodForm.get('addresses')).length] =
+      cityCtrl.valueChanges.pipe(
+        startWith(''),
+        map((value) => {
+          return typeof value === 'string' ? value : value.name;
+        }),
+        map((name) => (name ? this._cityFilter(name) : this.cities.slice()))
+      );
+
     (<FormArray>this.foodForm.get('addresses')).push(
       new FormGroup({
-        address: new FormControl(null),
-        city: new FormControl(null),
-        district: new FormControl(null),
-        ward: new FormControl(null),
+        address: addressCtrl,
+        ward: wardCtrl,
+        district: districtCtrl,
+        city: cityCtrl,
       })
     );
   }
 
   onAddReview() {
-    (<FormArray>this.foodForm.get('reviews')).push(new FormControl(null));
+    (<FormArray>this.foodForm.get('reviews')).push(new FormControl(''));
   }
 
   onSubmit() {
@@ -121,8 +132,6 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     this.foodForm.value.addresses.map((a: any) => {
       addresses.push(new FoodAddress(a.address, a.ward, a.district, a.city));
     });
-
-    console.log(addresses);
 
     this.foodService.addFood(
       new Food(
@@ -135,8 +144,6 @@ export class FoodEditComponent implements OnInit, OnDestroy {
         this.foodForm.value.images
       )
     );
-
-    console.log(this.foodService.getFoods());
 
     this.router.navigate(['../'], { relativeTo: this.route });
   }
@@ -177,46 +184,41 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     this.tagCtrl.setValue(null);
   }
 
-  onWardSelected(ward: any) {
+  onWardSelected(i: number, ward: any) {
     this.selectedWard = ward;
   }
 
-  onDistrictSelected(district: any) {
-    this.selectedDistrict = district;
+  onDistrictSelected(i: number, district: any) {
+    this.selectedDistrict[i] = district;
 
-    this.wards = [];
-    this.filterWards = new Observable();
+    this.filterWards[i] = new Observable();
 
     this.bService
-      .getWards(this.selectedCity.id, this.selectedDistrict.id)
+      .getWards(this.selectedCity[i].id, this.selectedDistrict[i].id)
       .subscribe((data) => {
         this.wards = data;
 
-        this.filterWards = this.districtCtrl.valueChanges.pipe(
+        this.filterWards[i] = this.districtControls[i].valueChanges.pipe(
           startWith(''),
           map((value) => {
             return typeof value === 'string' ? value : value.name;
           }),
-          map((name) =>
-            name ? this._districtFilter(name) : this.wards.slice()
-          )
+          map((name) => (name ? this._wardFilter(name) : this.wards.slice()))
         );
       });
   }
 
-  onCitySelected(city: any) {
-    this.selectedCity = city;
+  onCitySelected(i: number, city: any) {
+    this.selectedCity[i] = city;
 
-    this.wards = [];
-    this.filterWards = new Observable();
+    this.filterWards[i] = new Observable();
 
-    this.districts = [];
-    this.filterDistricts = new Observable();
+    this.filterDistricts[i] = new Observable();
 
-    this.bService.getDistricts(this.selectedCity.id).subscribe((data) => {
+    this.bService.getDistricts(this.selectedCity[i].id).subscribe((data) => {
       this.districts = data;
 
-      this.filterDistricts = this.districtCtrl.valueChanges.pipe(
+      this.filterDistricts[i] = this.cityControls[i].valueChanges.pipe(
         startWith(''),
         map((value) => {
           return typeof value === 'string' ? value : value.name;
@@ -241,6 +243,14 @@ export class FoodEditComponent implements OnInit, OnDestroy {
 
     return this.districts.filter((district) =>
       district.name.toLowerCase().includes(filterValue)
+    );
+  }
+
+  private _wardFilter(name: string) {
+    const filterValue = name.toLowerCase();
+
+    return this.wards.filter((ward) =>
+      ward.name.toLowerCase().includes(filterValue)
     );
   }
 

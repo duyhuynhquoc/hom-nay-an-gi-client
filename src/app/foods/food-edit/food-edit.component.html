@@ -14,13 +14,19 @@
 
   <mat-form-field class="example-full-width" appearance="fill">
     <mat-label>Giá trung bình</mat-label>
-    <input matInput placeholder="" value="" formControlName="averagePrice" />
+    <input
+      matInput
+      placeholder=""
+      value=""
+      formControlName="averagePrice"
+      autocomplete="off"
+    />
   </mat-form-field>
 
   <br />
 
   <div formArrayName="addresses">
-    <div *ngFor="let address of addressControls(); let i = index">
+    <div *ngFor="let address of addressGroupControls(); let i = index">
       <div [formGroupName]="i">
         <mat-form-field class="example-full-width" appearance="fill">
           <mat-label>Địa chỉ</mat-label>
@@ -40,14 +46,15 @@
             matInput
             formControlName="ward"
             [matAutocomplete]="ward"
+            autocomplete="off"
           />
           <mat-autocomplete
             #ward="matAutocomplete"
             [displayWith]="displayFn"
-            (optionSelected)="onWardSelected($event.option.value)"
+            (optionSelected)="onWardSelected(i, $event.option.value)"
           >
             <mat-option
-              *ngFor="let option of filterWards | async"
+              *ngFor="let option of filterWards[i] | async"
               [value]="option"
             >
               {{ option.name }}
@@ -63,14 +70,15 @@
             matInput
             formControlName="district"
             [matAutocomplete]="district"
+            autocomplete="off"
           />
           <mat-autocomplete
             #district="matAutocomplete"
             [displayWith]="displayFn"
-            (optionSelected)="onDistrictSelected($event.option.value)"
+            (optionSelected)="onDistrictSelected(i, $event.option.value)"
           >
             <mat-option
-              *ngFor="let option of filterDistricts | async"
+              *ngFor="let option of filterDistricts[i] | async"
               [value]="option"
             >
               {{ option.name }}
@@ -86,14 +94,15 @@
             matInput
             formControlName="city"
             [matAutocomplete]="city"
+            autocomplete="off"
           />
           <mat-autocomplete
             #city="matAutocomplete"
             [displayWith]="displayFn"
-            (optionSelected)="onCitySelected($event.option.value)"
+            (optionSelected)="onCitySelected(i, $event.option.value)"
           >
             <mat-option
-              *ngFor="let option of filterCities | async"
+              *ngFor="let option of filterCities[i] | async"
               [value]="option"
             >
               {{ option.name }}
@@ -146,6 +155,7 @@
         [matChipInputFor]="chipList"
         [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
         (matChipInputTokenEnd)="add($event)"
+        autocomplete="off"
       />
     </mat-chip-list>
     <mat-autocomplete
@@ -162,7 +172,12 @@
 
   <mat-form-field class="example-full-width" appearance="fill">
     <mat-label>Ghi chú</mat-label>
-    <textarea matInput placeholder="" formControlName="note"></textarea>
+    <textarea
+      matInput
+      placeholder=""
+      formControlName="note"
+      autocomplete="off"
+    ></textarea>
   </mat-form-field>
 
   <br />

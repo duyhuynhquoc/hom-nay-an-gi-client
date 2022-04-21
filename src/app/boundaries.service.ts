@@ -22,7 +22,14 @@ export class BoundariesService {
   getWards(cityId: number, districtId: number) {
     return this.getCities().pipe(
       map((data) => {
-        let wards: any[] = data[cityId - 1].districts[districtId - 1].wards;
+        let lastDistrictNumber = 0;
+        if (cityId >= 2)
+          lastDistrictNumber =
+            data[cityId - 2].districts[data[cityId - 2].districts.length - 1]
+              .id;
+
+        let wards: any[] =
+          data[cityId - 1].districts[districtId - 1 - lastDistrictNumber].wards;
         return wards;
       })
     );
