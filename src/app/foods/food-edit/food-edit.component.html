@@ -19,90 +19,111 @@
 
   <br />
 
-  <mat-form-field class="example-full-width" appearance="fill">
-    <mat-label>Địa chỉ</mat-label>
-    <input
-      matInput
-      placeholder=""
-      [formControl]="addressCtrl"
-      autocomplete="off"
-    />
-  </mat-form-field>
+  <div formArrayName="addresses">
+    <div *ngFor="let address of addressControls(); let i = index">
+      <div [formGroupName]="i">
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Địa chỉ</mat-label>
+          <input
+            matInput
+            placeholder=""
+            formControlName="address"
+            autocomplete="off"
+          />
+        </mat-form-field>
 
-  <mat-form-field class="example-full-width" appearance="fill">
-    <mat-label>Phường/Xã</mat-label>
-    <input
-      id="ward-input"
-      type="text"
-      matInput
-      [formControl]="wardCtrl"
-      [matAutocomplete]="ward"
-    />
-    <mat-autocomplete
-      #ward="matAutocomplete"
-      [displayWith]="displayFn"
-      (optionSelected)="onWardSelected($event.option.value)"
-    >
-      <mat-option *ngFor="let option of filterWards | async" [value]="option">
-        {{ option.name }}
-      </mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Phường/Xã</mat-label>
+          <input
+            id="ward-input"
+            type="text"
+            matInput
+            formControlName="ward"
+            [matAutocomplete]="ward"
+          />
+          <mat-autocomplete
+            #ward="matAutocomplete"
+            [displayWith]="displayFn"
+            (optionSelected)="onWardSelected($event.option.value)"
+          >
+            <mat-option
+              *ngFor="let option of filterWards | async"
+              [value]="option"
+            >
+              {{ option.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
 
-  <mat-form-field class="example-full-width" appearance="fill">
-    <mat-label>Quận/Huyện</mat-label>
-    <input
-      id="district-input"
-      type="text"
-      matInput
-      [formControl]="districtCtrl"
-      [matAutocomplete]="district"
-    />
-    <mat-autocomplete
-      #district="matAutocomplete"
-      [displayWith]="displayFn"
-      (optionSelected)="onDistrictSelected($event.option.value)"
-    >
-      <mat-option
-        *ngFor="let option of filterDistricts | async"
-        [value]="option"
-      >
-        {{ option.name }}
-      </mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Quận/Huyện</mat-label>
+          <input
+            id="district-input"
+            type="text"
+            matInput
+            formControlName="district"
+            [matAutocomplete]="district"
+          />
+          <mat-autocomplete
+            #district="matAutocomplete"
+            [displayWith]="displayFn"
+            (optionSelected)="onDistrictSelected($event.option.value)"
+          >
+            <mat-option
+              *ngFor="let option of filterDistricts | async"
+              [value]="option"
+            >
+              {{ option.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
 
-  <mat-form-field class="example-full-width" appearance="fill">
-    <mat-label>Tỉnh/Thành phố</mat-label>
-    <input
-      id="city-input"
-      type="text"
-      matInput
-      [formControl]="cityCtrl"
-      [matAutocomplete]="city"
-    />
-    <mat-autocomplete
-      #city="matAutocomplete"
-      [displayWith]="displayFn"
-      (optionSelected)="onCitySelected($event.option.value)"
-    >
-      <mat-option *ngFor="let option of filterCities | async" [value]="option">
-        {{ option.name }}
-      </mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Tỉnh/Thành phố</mat-label>
+          <input
+            id="city-input"
+            type="text"
+            matInput
+            formControlName="city"
+            [matAutocomplete]="city"
+          />
+          <mat-autocomplete
+            #city="matAutocomplete"
+            [displayWith]="displayFn"
+            (optionSelected)="onCitySelected($event.option.value)"
+          >
+            <mat-option
+              *ngFor="let option of filterCities | async"
+              [value]="option"
+            >
+              {{ option.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" mat-raised-button (click)="onAddAddress()">
+    + Địa chỉ
+  </button>
 
   <br />
 
-  <mat-form-field class="example-full-width" appearance="fill">
-    <mat-label>Link Review</mat-label>
-    <input
-      matInput
-      placeholder=""
-      [formControl]="reviewCtrl"
-      autocomplete="off"
-    />
-  </mat-form-field>
+  <div formArrayName="reviews">
+    <mat-form-field
+      *ngFor="let review of reviewControls(); let i = index"
+      class="example-full-width"
+      appearance="fill"
+    >
+      <mat-label>Link Review</mat-label>
+      <input matInput placeholder="" [formControlName]="i" autocomplete="off" />
+    </mat-form-field>
+  </div>
+
+  <button type="button" mat-raised-button (click)="onAddReview()">
+    + Link Review
+  </button>
 
   <br />
 
@@ -146,5 +167,5 @@
 
   <br />
 
-  <button pButton type="submit" label="Thêm"></button>
+  <button type="submit" color="primary" mat-raised-button>Thêm</button>
 </form>

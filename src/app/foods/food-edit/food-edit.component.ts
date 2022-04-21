@@ -15,6 +15,7 @@ import { map, startWith } from 'rxjs/operators';
 import { FoodsService } from '../foods.service';
 import { Food } from '../food.model';
 import { FoodAddress } from '../foodAddress.model';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-food-edit',
@@ -53,22 +54,17 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     foodName: new FormControl(null),
     averagePrice: new FormControl(null),
     note: new FormControl(null),
-    addresses: new FormArray([
-      new FormGroup({
-        address: this.addressCtrl,
-        city: this.cityCtrl,
-        district: this.districtCtrl,
-        ward: this.wardCtrl,
-      }),
-    ]),
-    reviews: new FormArray([this.reviewCtrl]),
+    addresses: new FormArray([]),
+    reviews: new FormArray([]),
     images: new FormArray([]),
     tags: new FormArray([]),
   });
 
   constructor(
     private bService: BoundariesService,
-    private foodService: FoodsService
+    private foodService: FoodsService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.filteredTags = this.tagCtrl.valueChanges.pipe(
       startWith(null),
@@ -90,30 +86,59 @@ export class FoodEditComponent implements OnInit, OnDestroy {
         map((name) => (name ? this._cityFilter(name) : this.cities.slice()))
       );
     });
+
+    this.onAddAddress();
+    this.onAddReview();
   }
 
   ngOnDestroy(): void {}
 
+  addressControls() {
+    return (<FormArray>this.foodForm.get('addresses')).controls;
+  }
+
+  reviewControls() {
+    return (<FormArray>this.foodForm.get('reviews')).controls;
+  }
+
+  onAddAddress() {
+    (<FormArray>this.foodForm.get('addresses')).push(
+      new FormGroup({
+        address: new FormControl(null),
+        city: new FormControl(null),
+        district: new FormControl(null),
+        ward: new FormControl(null),
+      })
+    );
+  }
+
+  onAddReview() {
+    (<FormArray>this.foodForm.get('reviews')).push(new FormControl(null));
+  }
+
   onSubmit() {
+    let addresses: any[] = [];
+    this.foodForm.value.addresses.map((a: any) => {
+      addresses.push(new FoodAddress(a.address, a.ward, a.district, a.city));
+    });
+
+    console.log(addresses);
+
     this.foodService.addFood(
       new Food(
         this.foodForm.value.foodName,
         this.foodForm.value.averagePrice,
         this.foodForm.value.note,
-        [
-          new FoodAddress(
-            this.foodForm.value.addresses[0].address,
-            this.foodForm.value.addresses[0].ward,
-            this.foodForm.value.addresses[0].district,
-            this.foodForm.value.addresses[0].city
-          ),
-        ],
+        addresses,
         this.foodForm.value.reviews,
         this.foodForm.value.tags,
         this.foodForm.value.images
       )
     );
-    // console.log(this.foodForm.value.foodName);
+
+    console.log(this.foodService.getFoods());
+
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   add(event: MatChipInputEvent): void {
