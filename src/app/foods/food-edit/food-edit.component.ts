@@ -23,6 +23,8 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./food-edit.component.scss'],
 })
 export class FoodEditComponent implements OnInit, OnDestroy {
+  // Each position i represents for the i-th address FormGroup
+
   addressControls: FormControl[] = [];
 
   wardControls: FormControl[] = [];
@@ -38,7 +40,6 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   cityControls: FormControl[] = [];
   selectedCity: any[] = [];
   cities: any[] = [];
-  // filterCitiesArr: Observable<any[]>[] = [];
   filterCities: Observable<any[]>[] = [];
 
   reviewCtrl: FormControl = new FormControl(null);
@@ -55,7 +56,7 @@ export class FoodEditComponent implements OnInit, OnDestroy {
 
   foodForm: FormGroup = new FormGroup({
     foodName: new FormControl(''),
-    averagePrice: new FormControl(''),
+    averagePrice: new FormControl(0),
     note: new FormControl(''),
     addresses: new FormArray([]),
     reviews: new FormArray([]),
@@ -127,22 +128,23 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     (<FormArray>this.foodForm.get('reviews')).push(new FormControl(''));
   }
 
-  onSubmit() {
+  async onSubmit() {
     let addresses: any[] = [];
     this.foodForm.value.addresses.map((a: any) => {
       addresses.push(new FoodAddress(a.address, a.ward, a.district, a.city));
     });
 
-    this.foodService.addFood(
-      new Food(
-        this.foodForm.value.foodName,
-        this.foodForm.value.averagePrice,
-        this.foodForm.value.note,
-        addresses,
-        this.foodForm.value.reviews,
-        this.foodForm.value.tags,
-        this.foodForm.value.images
-      )
+    const { foodName, averagePrice, note, reviews, tags, images } =
+      this.foodForm.value;
+
+    await this.foodService.addFood(
+      foodName,
+      averagePrice,
+      note,
+      addresses,
+      reviews,
+      tags,
+      images
     );
 
     this.router.navigate(['../'], { relativeTo: this.route });

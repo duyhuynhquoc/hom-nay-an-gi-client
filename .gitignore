@@ -8,6 +8,9 @@
 
 # Node
 /node_modules
+.vscode
+/src/environments
+
 npm-debug.log
 yarn-error.log
 

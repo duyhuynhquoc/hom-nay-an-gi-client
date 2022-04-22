@@ -1,20 +1,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { FoodListComponent } from './foods/food-list/food-list.component';
-import { FoodsComponent } from './foods/foods.component';
-import { FoodEditComponent } from './foods/food-edit/food-edit.component';
+import { SignupComponent } from './auth/signup/signup.component';
 
 const appRoutes: Routes = [
   { path: '', redirectTo: '/foods', pathMatch: 'full' },
   {
     path: 'foods',
-    component: FoodsComponent,
-    children: [
-      { path: '', component: FoodListComponent, pathMatch: 'full' },
-      { path: 'new', component: FoodEditComponent },
-    ],
+    loadChildren: () =>
+      import('./foods/foods.module').then((m) => m.FoodsModule),
   },
+  { path: 'signup', component: SignupComponent },
 ];
 
 @NgModule({

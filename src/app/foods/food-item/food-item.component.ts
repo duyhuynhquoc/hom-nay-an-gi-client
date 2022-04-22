@@ -7,7 +7,7 @@ import { Food } from '../food.model';
   styleUrls: ['./food-item.component.scss'],
 })
 export class FoodItemComponent implements OnInit {
-  @Input() food: Food = new Food('', 0, '', [], [], [], []);
+  @Input() food: Food = new Food('', '', 0, '', [], [], [], []);
 
   constructor() {}
 

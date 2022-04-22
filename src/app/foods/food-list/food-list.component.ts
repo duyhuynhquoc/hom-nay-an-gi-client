@@ -10,6 +10,7 @@ import { FoodsService } from '../foods.service';
 })
 export class FoodListComponent implements OnInit {
   foods: Food[] = [];
+  isFetching = false;
 
   constructor(
     private foodService: FoodsService,
@@ -17,7 +18,7 @@ export class FoodListComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.foodService.foodsChanged.subscribe((foods) => {
       this.foods = foods;
     });
