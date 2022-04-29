@@ -1,5 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
 import { SupabaseService } from '../supabase.service';
 import { Food } from './food.model';
 import { FoodAddress } from './foodAddress.model';
@@ -12,39 +13,52 @@ export class FoodsService {
 
   private foods: Food[] = [];
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private authService: AuthService
+  ) {}
 
-  async fetchFoods() {
-    const foods = (
-      await this.supabaseService.supabase.from('Food').select(
+  async fetchFoods(userId: string) {
+    this.foods = [];
+
+    if (userId == '') {
+      this.foodsChanged.next(this.foods);
+      return;
+    }
+
+    const { data } = await this.supabaseService.supabase
+      .from('User_Food')
+      .select(
         `
-          *,
-          addresses:FoodAddress(address, ward, district, city),
-          reviews:FoodReview(url),
-          tags:FoodTag(foodTagName),
-          images:FoodImage(url)
+          food:Food(
+            *,
+            addresses:FoodAddress(address, ward, district, city),
+            reviews:FoodReview(url),
+            tags:FoodTag(foodTagName),
+            images:FoodImage(url)
+          )
         `
       )
-    ).data;
+      .filter('userId', 'eq', userId);
 
-    if (foods) {
-      for (let f of foods) {
-        const addresses = f.addresses.map(
+    if (data) {
+      for (let item of data) {
+        const addresses = item.food.addresses.map(
           (a: any) => new FoodAddress(a.address, a.ward, a.district, a.city)
         );
 
-        const reviews = f.reviews.map((r: any) => r.url);
+        const reviews = item.food.reviews.map((r: any) => r.url);
 
-        const tags = f.tags.map((t: any) => t.tagName);
+        const tags = item.food.tags.map((t: any) => t.tagName);
 
-        const images = f.images.map((i: any) => i.url);
+        const images = item.food.images.map((i: any) => i.url);
 
         this.foods.push(
           new Food(
-            f.foodId,
-            f.foodName,
-            f.averagePrice,
-            f.note,
+            item.food.foodId,
+            item.food.foodName,
+            item.food.averagePrice,
+            item.food.note,
             addresses ? addresses : [],
             reviews ? reviews : [],
             tags ? tags : [],
@@ -52,12 +66,18 @@ export class FoodsService {
           )
         );
       }
+
       this.foodsChanged.next(this.foods);
     }
   }
 
   getFoods() {
     return this.foods.slice();
+  }
+
+  clearFoods() {
+    this.foods = [];
+    this.foodsChanged.next(this.foods);
   }
 
   async addFood(
@@ -105,6 +125,11 @@ export class FoodsService {
         }))
       );
 
+      await this.supabaseService.supabase.from('User_Food').insert({
+        userId: this.authService.getUserId(),
+        foodId: data[0].foodId,
+      });
+
       this.foods.push(
         new Food(
           data[0].foodId,
@@ -119,7 +144,6 @@ export class FoodsService {
       );
     }
 
-    console.log(data);
     this.foodsChanged.next(this.getFoods());
   }
 }

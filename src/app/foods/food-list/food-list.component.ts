@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
+import { User } from 'src/app/auth/user.model';
 import { Food } from '../food.model';
 import { FoodsService } from '../foods.service';
 
@@ -8,23 +11,40 @@ import { FoodsService } from '../foods.service';
   templateUrl: './food-list.component.html',
   styleUrls: ['./food-list.component.scss'],
 })
-export class FoodListComponent implements OnInit {
+export class FoodListComponent implements OnInit, OnDestroy {
   foods: Food[] = [];
   isFetching = false;
+  isAuthenticated = false;
+
+  foodsSub = new Subscription();
+  authSub = new Subscription();
 
   constructor(
     private foodService: FoodsService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.foodService.foodsChanged.subscribe((foods) => {
+    this.foodsSub = this.foodService.foodsChanged.subscribe((foods) => {
       this.foods = foods;
+      // console.log(foods);
+
+      // console.log(this.foods);
     });
 
+    this.authSub = this.authService.userChanged.subscribe((data) => {
+      this.isAuthenticated = !(data.userId == '');
+    });
+
+    this.isAuthenticated = this.authService.getUserName() != '';
     this.foods = this.foodService.getFoods();
-    console.log(this.foods);
+  }
+
+  ngOnDestroy(): void {
+    this.foodsSub.unsubscribe();
+    this.authSub.unsubscribe();
   }
 
   onAddFood() {

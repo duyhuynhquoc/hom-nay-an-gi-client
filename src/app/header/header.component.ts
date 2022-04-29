@@ -1,15 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
+import { FoodsService } from '../foods/foods.service';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.css'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
+  userName: string = '';
+  userSub = new Subscription();
 
-  constructor() { }
+  constructor(
+    private authService: AuthService,
+    private foodsService: FoodsService
+  ) {}
 
   ngOnInit(): void {
+    this.userSub = this.authService.userChanged.subscribe((data) => {
+      this.userName = data.userName;
+    });
   }
 
+  ngOnDestroy(): void {
+    this.userSub.unsubscribe();
+  }
+
+  signOut() {
+    this.authService.signOut();
+    this.userName = '';
+    this.foodsService.clearFoods();
+  }
 }

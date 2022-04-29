@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -13,12 +14,17 @@ export class SigninComponent implements OnInit {
     password: new FormControl(''),
   });
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {}
 
   onSubmit() {
     const { email, password } = this.signinForm.value;
+
     this.authService.signIn(email, password);
+
+    this.authService.userChanged.subscribe((data) => {
+      if (data !== null) this.router.navigate(['']);
+    });
   }
 }

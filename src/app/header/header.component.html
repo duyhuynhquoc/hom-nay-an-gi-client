@@ -1,7 +1,14 @@
 <div>
   <ul>
     <li><a routerLink="/foods">Foods</a></li>
-    <li><a routerLink="/signup">Sign up</a></li>
-    <li><a routerLink="/signin">Sign in</a></li>
+    <li *ngIf="userName == ''"><a routerLink="/signup">Sign up</a></li>
+    <li *ngIf="userName == ''"><a routerLink="/signin">Sign in</a></li>
+    <li *ngIf="userName !== ''">
+      <h3>{{ userName }}</h3>
+    </li>
+
+    <li *ngIf="userName !== ''">
+      <a routerLink="" (click)="signOut()">Sign out</a>
+    </li>
   </ul>
 </div>

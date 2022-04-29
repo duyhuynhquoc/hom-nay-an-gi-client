@@ -1,7 +1,13 @@
 <div>
   <h3 *ngIf="isFetching">Đang tải</h3>
   <app-food-item *ngFor="let food of foods" [food]="food"></app-food-item>
-  <button type="button" color="primary" mat-raised-button (click)="onAddFood()">
+  <button
+    type="button"
+    color="primary"
+    mat-raised-button
+    (click)="onAddFood()"
+    *ngIf="isAuthenticated"
+  >
     Thêm món
   </button>
 </div>

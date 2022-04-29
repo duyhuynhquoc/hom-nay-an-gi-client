@@ -1,4 +1,16 @@
+<h1>Đăng ký</h1>
 <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Tên hiển thị</mat-label>
+    <input
+      id="username"
+      type="text"
+      matInput
+      placeholder=""
+      autocomplete="off"
+      formControlName="userName"
+    />
+  </mat-form-field>
   <mat-form-field class="example-full-width" appearance="fill">
     <mat-label>Email</mat-label>
     <input

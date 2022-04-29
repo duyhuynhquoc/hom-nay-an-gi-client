@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SupabaseService } from 'src/app/supabase.service';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -14,12 +16,23 @@ export class SignupComponent implements OnInit {
     password: new FormControl(''),
   });
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {}
 
   async onSubmit() {
     const { email, password, userName } = this.signupForm.value;
-    const { user, error } = await this.supabaseService.signUp(email, password);
+    const { user, error } = await this.authService.signUp(
+      email,
+      password,
+      userName
+    );
+    console.log(user);
+
+    this.router.navigate(['signin']);
   }
 }

@@ -46,11 +46,16 @@ export class SupabaseService {
     return this.supabase.auth.onAuthStateChange(callback);
   }
 
-  signUp(email: string, password: string) {
-    return this.supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
+  signUp(email: string, password: string, data: {}) {
+    return this.supabase.auth.signUp(
+      {
+        email: email,
+        password: password,
+      },
+      {
+        data: data,
+      }
+    );
   }
 
   signIn(email: string, password: string) {

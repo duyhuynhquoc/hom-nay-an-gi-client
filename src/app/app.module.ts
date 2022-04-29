@@ -15,9 +15,15 @@ import { AngularMaterialModule } from './angular-material.module';
 import { SignupComponent } from './auth/signup/signup.component';
 import { HeaderComponent } from './header/header.component';
 import { FoodsModule } from './foods/foods.module';
+import { SigninComponent } from './auth/signin/signin.component';
 
 @NgModule({
-  declarations: [AppComponent, SignupComponent, HeaderComponent],
+  declarations: [
+    AppComponent,
+    SignupComponent,
+    SigninComponent,
+    HeaderComponent,
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,
