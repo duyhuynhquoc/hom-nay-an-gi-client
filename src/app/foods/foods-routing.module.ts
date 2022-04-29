@@ -12,6 +12,7 @@ const routes: Routes = [
     children: [
       { path: '', component: FoodListComponent, pathMatch: 'full' },
       { path: 'new', component: FoodEditComponent },
+      { path: ':id/edit', component: FoodEditComponent },
     ],
   },
 ];

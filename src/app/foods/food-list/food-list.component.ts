@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
-import { User } from 'src/app/auth/user.model';
 import { Food } from '../food.model';
 import { FoodsService } from '../foods.service';
 
@@ -29,9 +28,6 @@ export class FoodListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.foodsSub = this.foodService.foodsChanged.subscribe((foods) => {
       this.foods = foods;
-      // console.log(foods);
-
-      // console.log(this.foods);
     });
 
     this.authSub = this.authService.userChanged.subscribe((data) => {

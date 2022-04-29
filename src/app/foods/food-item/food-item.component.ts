@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Food } from '../food.model';
 
 @Component({
@@ -9,7 +10,11 @@ import { Food } from '../food.model';
 export class FoodItemComponent implements OnInit {
   @Input() food: Food = new Food('', '', 0, '', [], [], [], []);
 
-  constructor() {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {}
+
+  onEditFood() {
+    this.router.navigate([this.food.foodId, 'edit']);
+  }
 }

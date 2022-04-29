@@ -1,5 +1,5 @@
 <div class="food-item">
-  <p-card [header]="food.foodName" [style]="{ width: '360px' }">
+  <p-card [style]="{ width: '360px' }">
     <ng-template pTemplate="header">
       <div class="image-container">
         <img
@@ -14,7 +14,8 @@
         />
       </div>
     </ng-template>
-    <div>
+    <div class="food-item__body">
+      <h1>{{ food.foodName }}</h1>
       <p>{{ food.averagePrice }}</p>
       <p *ngIf="food.addresses.length > 0">
         {{ food.addresses[0].address }}, P.{{ food.addresses[0].ward }},
@@ -23,7 +24,7 @@
       <p>{{ food.reviews[0] }}</p>
       <p *ngFor="let tag of food.tags">{{ tag }}</p>
 
-      <a href="#">Xem thêm...</a>
+      <a (click)="onEditFood()">Xem thêm...</a>
     </div>
   </p-card>
 </div>
