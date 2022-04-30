@@ -1,4 +1,4 @@
-<div class="food-item">
+<!-- <div class="food-item">
   <p-card [style]="{ width: '360px' }">
     <ng-template pTemplate="header">
       <div class="image-container">
@@ -27,4 +27,48 @@
       <a (click)="onEditFood()">Xem thêm...</a>
     </div>
   </p-card>
+</div> -->
+
+<div class="food-item">
+  <div class="header">
+    <div class="image-container">
+      <img
+        [src]="food.images[0]"
+        [alt]="food.foodName"
+        *ngIf="food.images.length >= 1"
+      />
+      <img
+        src="https://cdn.dribbble.com/users/1044993/screenshots/15079662/media/bddc27ef9e0a818af1be0884cd685bac.png?compress=1&resize=400x300"
+        [alt]="food.foodName"
+        *ngIf="food.images.length < 1"
+      />
+    </div>
+  </div>
+  <div class="body">
+    <div class="food-name">
+      <h1>{{ food.foodName }}</h1>
+    </div>
+    <div class="food-address" *ngIf="food.addresses.length > 0">
+      <p>
+        {{ food.addresses[0].address }}, {{ food.addresses[0].ward }},
+        {{ food.addresses[0].district }}, {{ food.addresses[0].city }}
+      </p>
+    </div>
+    <div class="food-review" *ngIf="food.reviews.length > 0">
+      <a [href]="food.reviews[0]">
+        {{ food.reviews[0] }}
+      </a>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="food-tags">
+      <div *ngIf="food.tags.length > 0">
+        <div class="tag" *ngFor="let tag of food.tags">
+          {{ tag }}
+        </div>
+      </div>
+    </div>
+
+    <a class="detail-btn" (click)="onEditFood()">Xem thêm...</a>
+  </div>
 </div>

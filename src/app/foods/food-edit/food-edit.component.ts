@@ -16,6 +16,7 @@ import { FoodsService } from '../foods.service';
 import { Food } from '../food.model';
 import { FoodAddress } from '../foodAddress.model';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SupabaseService } from 'src/app/supabase.service';
 
 @Component({
   selector: 'app-food-edit',
@@ -49,7 +50,7 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   separatorKeysCodes: number[] = [ENTER, COMMA];
 
   // [TODO] Fetch real tags
-  allTags: string[] = ['mon nuong', 'banh trang'];
+  allTags: string[] = [];
   tags: string[] = [];
   tagCtrl: FormControl = new FormControl(null);
   filteredTags: Observable<string[]> = new Observable();
@@ -67,21 +68,26 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   constructor(
     private bService: BoundariesService,
     private foodService: FoodsService,
+    private supabaseService: SupabaseService,
     private router: Router,
     private route: ActivatedRoute
-  ) {
+  ) {}
+
+  async ngOnInit() {
+    this.bService.getCities().subscribe((data) => {
+      this.cities = data;
+    });
+
+    (await this.supabaseService.supabase.from('FoodTag').select('*')).data?.map(
+      (tag) => this.allTags.push(tag.foodTagName)
+    );
+
     this.filteredTags = this.tagCtrl.valueChanges.pipe(
       startWith(null),
       map((fruit: string | null) =>
         fruit ? this._filter(fruit) : this.allTags.slice()
       )
     );
-  }
-
-  ngOnInit(): void {
-    this.bService.getCities().subscribe((data) => {
-      this.cities = data;
-    });
   }
 
   ngOnDestroy(): void {}
@@ -131,7 +137,9 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   async onSubmit() {
     let addresses: any[] = [];
     this.foodForm.value.addresses.map((a: any) => {
-      addresses.push(new FoodAddress(a.address, a.ward, a.district, a.city));
+      addresses.push(
+        new FoodAddress(a.address, a.ward.name, a.district.name, a.city.name)
+      );
     });
 
     const { foodName, averagePrice, note, reviews, tags, images } =
@@ -148,6 +156,11 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     );
 
     this.router.navigate(['../'], { relativeTo: this.route });
+  }
+
+  async onDeleteFood() {
+    await this.foodService.deleteFood(this.route.snapshot.params['id']);
+    this.router.navigate(['foods']);
   }
 
   add(event: MatChipInputEvent): void {
@@ -200,7 +213,7 @@ export class FoodEditComponent implements OnInit, OnDestroy {
       .subscribe((data) => {
         this.wards = data;
 
-        this.filterWards[i] = this.districtControls[i].valueChanges.pipe(
+        this.filterWards[i] = this.wardControls[i].valueChanges.pipe(
           startWith(''),
           map((value) => {
             return typeof value === 'string' ? value : value.name;
@@ -220,7 +233,7 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     this.bService.getDistricts(this.selectedCity[i].id).subscribe((data) => {
       this.districts = data;
 
-      this.filterDistricts[i] = this.cityControls[i].valueChanges.pipe(
+      this.filterDistricts[i] = this.districtControls[i].valueChanges.pipe(
         startWith(''),
         map((value) => {
           return typeof value === 'string' ? value : value.name;

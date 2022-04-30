@@ -22,7 +22,7 @@ export class FoodsService {
     this.foods = [];
 
     if (userId == '') {
-      this.foodsChanged.next(this.foods);
+      this.foodsChanged.next(this.getFoods());
       return;
     }
 
@@ -30,6 +30,7 @@ export class FoodsService {
       .from('User_Food')
       .select(
         `
+          created_at,
           food:Food(
             *,
             addresses:FoodAddress(address, ward, district, city),
@@ -39,7 +40,8 @@ export class FoodsService {
           )
         `
       )
-      .filter('userId', 'eq', userId);
+      .filter('userId', 'eq', userId)
+      .order('created_at', { ascending: false });
 
     if (data) {
       for (let item of data) {
@@ -49,7 +51,7 @@ export class FoodsService {
 
         const reviews = item.food.reviews.map((r: any) => r.url);
 
-        const tags = item.food.tags.map((t: any) => t.tagName);
+        const tags = item.food.tags.map((t: any) => t.foodTagName);
 
         const images = item.food.images.map((i: any) => i.url);
 
@@ -67,7 +69,10 @@ export class FoodsService {
         );
       }
 
-      this.foodsChanged.next(this.foods);
+      this.foodsChanged.next(this.getFoods());
+      console.log(data);
+
+      console.log(this.foods);
     }
   }
 
@@ -77,7 +82,7 @@ export class FoodsService {
 
   clearFoods() {
     this.foods = [];
-    this.foodsChanged.next(this.foods);
+    this.foodsChanged.next(this.getFoods());
   }
 
   async addFood(
@@ -97,9 +102,9 @@ export class FoodsService {
       await this.supabaseService.supabase.from('FoodAddress').insert(
         addresses.map((a: any) => ({
           address: a.address,
-          ward: a.ward.name,
-          district: a.district.name,
-          city: a.city.name,
+          ward: a.ward,
+          district: a.district,
+          city: a.city,
           foodId: data[0].foodId,
         }))
       );
@@ -130,7 +135,7 @@ export class FoodsService {
         foodId: data[0].foodId,
       });
 
-      this.foods.push(
+      this.foods.unshift(
         new Food(
           data[0].foodId,
           foodName,
@@ -144,6 +149,36 @@ export class FoodsService {
       );
     }
 
+    this.foodsChanged.next(this.getFoods());
+  }
+
+  async deleteFood(foodId: string) {
+    await this.supabaseService.supabase
+      .from('FoodAddress')
+      .delete()
+      .match({ foodId: foodId });
+    await this.supabaseService.supabase
+      .from('FoodReview')
+      .delete()
+      .match({ foodId: foodId });
+    await this.supabaseService.supabase
+      .from('FoodTag')
+      .delete()
+      .match({ foodId: foodId });
+    await this.supabaseService.supabase
+      .from('FoodImage')
+      .delete()
+      .match({ foodId: foodId });
+    await this.supabaseService.supabase
+      .from('User_Food')
+      .delete()
+      .match({ foodId: foodId });
+    await this.supabaseService.supabase
+      .from('Food')
+      .delete()
+      .match({ foodId: foodId });
+
+    this.foods = this.foods.filter((f) => f.foodId !== foodId);
     this.foodsChanged.next(this.getFoods());
   }
 }

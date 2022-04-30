@@ -1,8 +1,8 @@
 export class FoodAddress {
   constructor(
     public address: string,
-    public ward: any,
-    public district: any,
-    public city: any
+    public ward: string,
+    public district: string,
+    public city: string
   ) {}
 }

@@ -15,6 +15,6 @@ export class FoodItemComponent implements OnInit {
   ngOnInit(): void {}
 
   onEditFood() {
-    this.router.navigate([this.food.foodId, 'edit']);
+    this.router.navigate(['foods', this.food.foodId, 'edit']);
   }
 }
