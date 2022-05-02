@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { FoodsService } from './foods.service';
 
@@ -16,9 +15,9 @@ export class FoodsComponent implements OnInit, OnDestroy {
     private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     if (this.authService.getUserId() != '')
-      this.foodService.fetchFoods(this.authService.getUserId());
+      await this.foodService.fetchFoods(this.authService.getUserId());
   }
 
   ngOnDestroy(): void {

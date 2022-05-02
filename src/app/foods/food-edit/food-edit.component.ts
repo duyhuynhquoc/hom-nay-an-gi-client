@@ -9,14 +9,14 @@ import {
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { BoundariesService } from 'src/app/boundaries.service';
 import { map, startWith } from 'rxjs/operators';
 import { FoodsService } from '../foods.service';
-import { Food } from '../food.model';
 import { FoodAddress } from '../foodAddress.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SupabaseService } from 'src/app/supabase.service';
+import { Food } from '../food.model';
 
 @Component({
   selector: 'app-food-edit',
@@ -25,7 +25,6 @@ import { SupabaseService } from 'src/app/supabase.service';
 })
 export class FoodEditComponent implements OnInit, OnDestroy {
   // Each position i represents for the i-th address FormGroup
-
   addressControls: FormControl[] = [];
 
   wardControls: FormControl[] = [];
@@ -49,7 +48,6 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   tagInput: ElementRef<HTMLInputElement> = {} as ElementRef;
   separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  // [TODO] Fetch real tags
   allTags: string[] = [];
   tags: string[] = [];
   tagCtrl: FormControl = new FormControl(null);
@@ -78,10 +76,23 @@ export class FoodEditComponent implements OnInit, OnDestroy {
       this.cities = data;
     });
 
+    // If it is edit mode -> Init form
+    if (this.route.snapshot.routeConfig?.path === ':id/edit') {
+      let food = this.foodService.getFood(this.route.snapshot.params['id']);
+      this.initForm(food);
+
+      this.foodService.foodsChanged.subscribe((foods) => {
+        food = this.foodService.getFood(this.route.snapshot.params['id']);
+        this.initForm(food);
+      });
+    }
+
+    // Fetch tags from DB
     (await this.supabaseService.supabase.from('FoodTag').select('*')).data?.map(
       (tag) => this.allTags.push(tag.foodTagName)
     );
 
+    // Update auto-complete input
     this.filteredTags = this.tagCtrl.valueChanges.pipe(
       startWith(null),
       map((fruit: string | null) =>
@@ -98,6 +109,59 @@ export class FoodEditComponent implements OnInit, OnDestroy {
 
   reviewControls() {
     return (<FormArray>this.foodForm.get('reviews')).controls;
+  }
+
+  private initForm(food: Food) {
+    console.log(food);
+
+    let addresses = new FormArray([]);
+    food.addresses.map((a) => {
+      let addressCtrl: FormControl = new FormControl(a.address);
+      let wardCtrl: FormControl = new FormControl(a.ward);
+      let districtCtrl: FormControl = new FormControl(a.district);
+      let cityCtrl: FormControl = new FormControl(a.city);
+
+      this.addressControls.push(addressCtrl);
+      this.wardControls.push(wardCtrl);
+      this.districtControls.push(districtCtrl);
+      this.cityControls.push(cityCtrl);
+
+      console.log(addressCtrl);
+      console.log(wardCtrl);
+      console.log(districtCtrl);
+      console.log(cityCtrl);
+
+      addresses.push(
+        new FormGroup({
+          address: addressCtrl,
+          ward: wardCtrl,
+          district: districtCtrl,
+          city: cityCtrl,
+        })
+      );
+    });
+
+    let reviews = new FormArray([]);
+    food.reviews.map((r) => {
+      reviews.push(new FormControl(r));
+    });
+
+    let tags = new FormArray([]);
+    food.tags.map((t) => {
+      tags.push(new FormControl(t));
+    });
+
+    if (food) {
+      this.foodForm = new FormGroup({
+        foodName: new FormControl(food.foodName),
+        averagePrice: new FormControl(food.averagePrice),
+        note: new FormControl(food.note),
+        addresses: addresses,
+        reviews: reviews,
+        images: new FormArray([]),
+        tags: tags,
+      });
+    }
   }
 
   onAddAddress() {
@@ -138,7 +202,22 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     let addresses: any[] = [];
     this.foodForm.value.addresses.map((a: any) => {
       addresses.push(
-        new FoodAddress(a.address, a.ward.name, a.district.name, a.city.name)
+        new FoodAddress(
+          a.address,
+          {
+            id: a.ward.id,
+            name: a.ward.name,
+          },
+          {
+            id: a.district.id,
+            name: a.district.name,
+          },
+          {
+            id: a.city.id,
+            code: a.city.code,
+            name: a.city.name,
+          }
+        )
       );
     });
 
@@ -225,6 +304,7 @@ export class FoodEditComponent implements OnInit, OnDestroy {
 
   onCitySelected(i: number, city: any) {
     this.selectedCity[i] = city;
+    console.log(city);
 
     this.filterWards[i] = new Observable();
 

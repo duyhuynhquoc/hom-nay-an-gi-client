@@ -68,16 +68,26 @@ export class FoodsService {
           )
         );
       }
-
-      this.foodsChanged.next(this.getFoods());
-      console.log(data);
-
-      console.log(this.foods);
     }
+
+    this.foodsChanged.next(this.getFoods());
+    console.log(this.foods);
   }
 
   getFoods() {
     return this.foods.slice();
+  }
+
+  getFood(id: string) {
+    let result = new Food('', '', 0, '', [], [], [], []);
+
+    this.getFoods().map((f) => {
+      if (f.foodId == id) {
+        result = f;
+      }
+    });
+
+    return result;
   }
 
   clearFoods() {

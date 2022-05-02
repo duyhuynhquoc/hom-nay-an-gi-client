@@ -7,7 +7,7 @@ export class BoundariesService {
   constructor(private http: HttpClient) {}
 
   getCities() {
-    return this.http.get<any[]>('/assets/boundaries.json');
+    return this.http.get<any[]>('/assets/boundaries.json').pipe();
   }
 
   getDistricts(cityId: number) {

@@ -50,8 +50,8 @@
     </div>
     <div class="food-address" *ngIf="food.addresses.length > 0">
       <p>
-        {{ food.addresses[0].address }}, {{ food.addresses[0].ward }},
-        {{ food.addresses[0].district }}, {{ food.addresses[0].city }}
+        {{ food.addresses[0].address }}, {{ food.addresses[0].ward.name }},
+        {{ food.addresses[0].district.name }}, {{ food.addresses[0].city.name }}
       </p>
     </div>
     <div class="food-review" *ngIf="food.reviews.length > 0">
