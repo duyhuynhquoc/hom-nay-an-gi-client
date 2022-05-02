@@ -9,7 +9,7 @@ import {
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { BoundariesService } from 'src/app/boundaries.service';
 import { map, startWith } from 'rxjs/operators';
 import { FoodsService } from '../foods.service';
@@ -24,7 +24,9 @@ import { Food } from '../food.model';
   styleUrls: ['./food-edit.component.scss'],
 })
 export class FoodEditComponent implements OnInit, OnDestroy {
-  // Each position i represents for the i-th address FormGroup
+  isEditMode = false;
+
+  /// Each position i represents for the i-th address FormGroup
   addressControls: FormControl[] = [];
 
   wardControls: FormControl[] = [];
@@ -52,6 +54,9 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   tags: string[] = [];
   tagCtrl: FormControl = new FormControl(null);
   filteredTags: Observable<string[]> = new Observable();
+  ///
+
+  foodSub = new Subscription();
 
   foodForm: FormGroup = new FormGroup({
     foodName: new FormControl(''),
@@ -78,10 +83,13 @@ export class FoodEditComponent implements OnInit, OnDestroy {
 
     // If it is edit mode -> Init form
     if (this.route.snapshot.routeConfig?.path === ':id/edit') {
+      this.isEditMode = true;
+
+      // Get food with id and fill the inputs
       let food = this.foodService.getFood(this.route.snapshot.params['id']);
       this.initForm(food);
 
-      this.foodService.foodsChanged.subscribe((foods) => {
+      this.foodSub = this.foodService.foodsChanged.subscribe((foods) => {
         food = this.foodService.getFood(this.route.snapshot.params['id']);
         this.initForm(food);
       });
@@ -101,7 +109,9 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.foodSub.unsubscribe();
+  }
 
   addressGroupControls() {
     return (<FormArray>this.foodForm.get('addresses')).controls;
@@ -112,8 +122,6 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   }
 
   private initForm(food: Food) {
-    console.log(food);
-
     let addresses = new FormArray([]);
     food.addresses.map((a) => {
       let addressCtrl: FormControl = new FormControl(a.address);
@@ -126,10 +134,47 @@ export class FoodEditComponent implements OnInit, OnDestroy {
       this.districtControls.push(districtCtrl);
       this.cityControls.push(cityCtrl);
 
-      console.log(addressCtrl);
-      console.log(wardCtrl);
-      console.log(districtCtrl);
-      console.log(cityCtrl);
+      let currentIndex = (<FormArray>this.foodForm.get('addresses')).length;
+
+      this.filterCities[currentIndex] = cityCtrl.valueChanges.pipe(
+        startWith(a.city.name),
+        map((value) => {
+          return typeof value === 'string' ? value : value.name;
+        }),
+        map((name) => (name ? this._cityFilter(name) : this.cities.slice()))
+      );
+
+      this.bService.getDistricts(a.city.id).subscribe((districts) => {
+        this.districts.push(districts);
+
+        this.filterDistricts[currentIndex] = districtCtrl.valueChanges.pipe(
+          startWith(a.district.name),
+          map((value) => {
+            return typeof value === 'string' ? value : value.name;
+          }),
+          map((name) =>
+            name
+              ? this._districtFilter(currentIndex, name)
+              : this.districts[currentIndex].slice()
+          )
+        );
+      });
+
+      this.bService.getWards(a.city.id, a.district.id).subscribe((wards) => {
+        this.wards.push(wards);
+
+        this.filterWards[currentIndex] = wardCtrl.valueChanges.pipe(
+          startWith(a.ward.name),
+          map((value) => {
+            return typeof value === 'string' ? value : value.name;
+          }),
+          map((name) =>
+            name
+              ? this._wardFilter(currentIndex, name)
+              : this.wards[currentIndex].slice()
+          )
+        );
+      });
 
       addresses.push(
         new FormGroup({
@@ -148,6 +193,7 @@ export class FoodEditComponent implements OnInit, OnDestroy {
 
     let tags = new FormArray([]);
     food.tags.map((t) => {
+      this.tags.push(t);
       tags.push(new FormControl(t));
     });
 
@@ -183,6 +229,9 @@ export class FoodEditComponent implements OnInit, OnDestroy {
         }),
         map((name) => (name ? this._cityFilter(name) : this.cities.slice()))
       );
+
+    this.districts.push([]);
+    this.wards.push([]);
 
     (<FormArray>this.foodForm.get('addresses')).push(
       new FormGroup({
@@ -224,22 +273,50 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     const { foodName, averagePrice, note, reviews, tags, images } =
       this.foodForm.value;
 
-    await this.foodService.addFood(
-      foodName,
-      averagePrice,
-      note,
-      addresses,
-      reviews,
-      tags,
-      images
-    );
+    if (this.isEditMode) {
+      // Edit food mode
+      await this.foodService.updateFood(
+        this.route.snapshot.params['id'],
+        foodName,
+        averagePrice,
+        note,
+        addresses,
+        reviews,
+        tags,
+        images
+      );
+      console.log('Edit');
+    } else {
+      // Add new food mode
+      await this.foodService.addFood(
+        foodName,
+        averagePrice,
+        note,
+        addresses,
+        reviews,
+        tags,
+        images
+      );
+    }
 
-    this.router.navigate(['../'], { relativeTo: this.route });
+    this.router.navigate(['foods']);
   }
 
   async onDeleteFood() {
     await this.foodService.deleteFood(this.route.snapshot.params['id']);
     this.router.navigate(['foods']);
+  }
+
+  onDeleteAddress(i: number) {
+    this.addressControls.splice(i);
+    this.wardControls.splice(i);
+    this.districtControls.splice(i);
+    this.cityControls.splice(i);
+    (<FormArray>this.foodForm.get('addresses')).removeAt(i);
+  }
+
+  onDeleteReview(i: number) {
+    (<FormArray>this.foodForm.get('reviews')).removeAt(i);
   }
 
   add(event: MatChipInputEvent): void {
@@ -264,6 +341,7 @@ export class FoodEditComponent implements OnInit, OnDestroy {
 
     if (index >= 0) {
       this.tags.splice(index, 1);
+      (<FormArray>this.foodForm.get('tags')).removeAt(index);
     }
   }
 
@@ -290,28 +368,29 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     this.bService
       .getWards(this.selectedCity[i].id, this.selectedDistrict[i].id)
       .subscribe((data) => {
-        this.wards = data;
+        this.wards[i] = data;
 
         this.filterWards[i] = this.wardControls[i].valueChanges.pipe(
           startWith(''),
           map((value) => {
             return typeof value === 'string' ? value : value.name;
           }),
-          map((name) => (name ? this._wardFilter(name) : this.wards.slice()))
+          map((name) =>
+            name ? this._wardFilter(i, name) : this.wards[i].slice()
+          )
         );
       });
   }
 
   onCitySelected(i: number, city: any) {
     this.selectedCity[i] = city;
-    console.log(city);
 
     this.filterWards[i] = new Observable();
 
     this.filterDistricts[i] = new Observable();
 
     this.bService.getDistricts(this.selectedCity[i].id).subscribe((data) => {
-      this.districts = data;
+      this.districts[i] = data;
 
       this.filterDistricts[i] = this.districtControls[i].valueChanges.pipe(
         startWith(''),
@@ -319,7 +398,7 @@ export class FoodEditComponent implements OnInit, OnDestroy {
           return typeof value === 'string' ? value : value.name;
         }),
         map((name) =>
-          name ? this._districtFilter(name) : this.districts.slice()
+          name ? this._districtFilter(i, name) : this.districts[i].slice()
         )
       );
     });
@@ -333,18 +412,18 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  private _districtFilter(name: string) {
+  private _districtFilter(i: number, name: string) {
     const filterValue = name.toLowerCase();
 
-    return this.districts.filter((district) =>
+    return this.districts[i].filter((district: any) =>
       district.name.toLowerCase().includes(filterValue)
     );
   }
 
-  private _wardFilter(name: string) {
+  private _wardFilter(i: number, name: string) {
     const filterValue = name.toLowerCase();
 
-    return this.wards.filter((ward) =>
+    return this.wards[i].filter((ward: any) =>
       ward.name.toLowerCase().includes(filterValue)
     );
   }

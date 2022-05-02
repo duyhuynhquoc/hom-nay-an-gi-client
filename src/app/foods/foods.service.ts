@@ -162,6 +162,87 @@ export class FoodsService {
     this.foodsChanged.next(this.getFoods());
   }
 
+  async updateFood(
+    foodId: string,
+    foodName: any,
+    averagePrice: any,
+    note: any,
+    addresses: FoodAddress[],
+    reviews: any[],
+    tags: any[],
+    images: any[]
+  ) {
+    await this.supabaseService.supabase
+      .from('FoodAddress')
+      .delete()
+      .match({ foodId: foodId });
+    await this.supabaseService.supabase
+      .from('FoodReview')
+      .delete()
+      .match({ foodId: foodId });
+    await this.supabaseService.supabase
+      .from('FoodTag')
+      .delete()
+      .match({ foodId: foodId });
+    await this.supabaseService.supabase
+      .from('FoodImage')
+      .delete()
+      .match({ foodId: foodId });
+
+    await this.supabaseService.supabase
+      .from('Food')
+      .update({ foodName, averagePrice, note })
+      .eq('foodId', foodId);
+
+    await this.supabaseService.supabase.from('FoodAddress').insert(
+      addresses.map((a: any) => ({
+        address: a.address,
+        ward: a.ward,
+        district: a.district,
+        city: a.city,
+        foodId,
+      }))
+    );
+
+    await this.supabaseService.supabase.from('FoodReview').insert(
+      reviews.map((r: any) => ({
+        url: r,
+        foodId,
+      }))
+    );
+
+    await this.supabaseService.supabase.from('FoodTag').insert(
+      tags.map((t: any) => ({
+        foodTagName: t,
+        foodId,
+      }))
+    );
+
+    await this.supabaseService.supabase.from('FoodImage').insert(
+      images.map((i: any) => ({
+        url: i,
+        foodId,
+      }))
+    );
+
+    this.foods = this.foods.map((f) => {
+      if (f.foodId == foodId) {
+        f = new Food(
+          foodId,
+          foodName,
+          averagePrice,
+          note,
+          addresses,
+          reviews,
+          tags,
+          images
+        );
+      }
+      return f;
+    });
+    this.foodsChanged.next(this.getFoods());
+  }
+
   async deleteFood(foodId: string) {
     await this.supabaseService.supabase
       .from('FoodAddress')

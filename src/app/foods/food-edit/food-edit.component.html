@@ -1,6 +1,12 @@
 <h1>Thêm món mới</h1>
 <form [formGroup]="foodForm" (ngSubmit)="onSubmit()">
-  <mat-form-field class="example-full-width" appearance="fill">
+  <h3>Tên món</h3>
+
+  <mat-form-field
+    class="example-full-width"
+    appearance="fill"
+    class="food-name"
+  >
     <mat-label>Tên món</mat-label>
     <input
       matInput
@@ -10,9 +16,13 @@
     />
   </mat-form-field>
 
-  <br />
+  <h3>Giá trung bình</h3>
 
-  <mat-form-field class="example-full-width" appearance="fill">
+  <mat-form-field
+    class="example-full-width"
+    appearance="fill"
+    class="food-average-price"
+  >
     <mat-label>Giá trung bình</mat-label>
     <input
       matInput
@@ -23,12 +33,19 @@
     />
   </mat-form-field>
 
-  <br />
+  <h3>Địa chỉ</h3>
 
   <div formArrayName="addresses">
-    <div *ngFor="let address of addressGroupControls(); let i = index">
+    <div
+      *ngFor="let address of addressGroupControls(); let i = index"
+      class="food-address"
+    >
       <div [formGroupName]="i">
-        <mat-form-field class="example-full-width" appearance="fill">
+        <mat-form-field
+          class="example-full-width"
+          appearance="fill"
+          class="address"
+        >
           <mat-label>Địa chỉ</mat-label>
           <input
             matInput
@@ -38,7 +55,11 @@
           />
         </mat-form-field>
 
-        <mat-form-field class="example-full-width" appearance="fill">
+        <mat-form-field
+          class="example-full-width"
+          appearance="fill"
+          class="ward"
+        >
           <mat-label>Phường/Xã</mat-label>
           <input
             id="ward-input"
@@ -62,7 +83,11 @@
           </mat-autocomplete>
         </mat-form-field>
 
-        <mat-form-field class="example-full-width" appearance="fill">
+        <mat-form-field
+          class="example-full-width"
+          appearance="fill"
+          class="district"
+        >
           <mat-label>Quận/Huyện</mat-label>
           <input
             id="district-input"
@@ -86,7 +111,11 @@
           </mat-autocomplete>
         </mat-form-field>
 
-        <mat-form-field class="example-full-width" appearance="fill">
+        <mat-form-field
+          class="example-full-width"
+          appearance="fill"
+          class="city"
+        >
           <mat-label>Tỉnh/Thành phố</mat-label>
           <input
             id="city-input"
@@ -109,36 +138,67 @@
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
+
+        <div (click)="onDeleteAddress(i)" class="delete-icon">
+          <mat-icon aria-hidden="false" aria-label="Example home icon"
+            >delete</mat-icon
+          >
+        </div>
       </div>
     </div>
   </div>
 
-  <button type="button" mat-raised-button (click)="onAddAddress()">
+  <button
+    type="button"
+    mat-raised-button
+    (click)="onAddAddress()"
+    class="add-address-btn"
+  >
     + Địa chỉ
   </button>
 
-  <br />
+  <h3>Link review</h3>
 
   <div formArrayName="reviews">
-    <mat-form-field
-      *ngFor="let review of reviewControls(); let i = index"
-      class="example-full-width"
-      appearance="fill"
-    >
-      <mat-label>Link Review</mat-label>
-      <input matInput placeholder="" [formControlName]="i" autocomplete="off" />
-    </mat-form-field>
+    <div *ngFor="let review of reviewControls(); let i = index">
+      <mat-form-field
+        class="example-full-width"
+        appearance="fill"
+        class="food-review"
+      >
+        <mat-label>Link Review</mat-label>
+        <input
+          matInput
+          placeholder=""
+          [formControlName]="i"
+          autocomplete="off"
+        />
+      </mat-form-field>
+
+      <div (click)="onDeleteReview(i)" class="delete-icon">
+        <mat-icon aria-hidden="false" aria-label="Example home icon"
+          >delete</mat-icon
+        >
+      </div>
+    </div>
   </div>
 
-  <button type="button" mat-raised-button (click)="onAddReview()">
+  <button
+    type="button"
+    mat-raised-button
+    (click)="onAddReview()"
+    class="add-review-btn"
+  >
     + Link Review
   </button>
 
-  <br />
+  <h3>Hình ảnh</h3>
 
   <!-- [TODO] Image Upload + Image pasting area -->
 
-  <mat-form-field class="example-chip-list" appearance="fill">
+  <h3>Tag</h3>
+
+  <mat-form-field class="example-chip-list" appearance="fill" class="food-tags">
     <mat-label>Favorite tags</mat-label>
     <mat-chip-list #chipList aria-label="tag selection">
       <mat-chip *ngFor="let tag of tags" (removed)="remove(tag)">
@@ -168,22 +228,49 @@
     </mat-autocomplete>
   </mat-form-field>
 
-  <br />
+  <h3>Ghi chú</h3>
 
-  <mat-form-field class="example-full-width" appearance="fill">
+  <mat-form-field
+    class="example-full-width"
+    appearance="fill"
+    class="food-note"
+  >
     <mat-label>Ghi chú</mat-label>
     <textarea
       matInput
       placeholder=""
       formControlName="note"
       autocomplete="off"
+      rows="5"
     ></textarea>
   </mat-form-field>
 
-  <br />
-
-  <button type="button" color="warn" mat-raised-button (click)="onDeleteFood()">
+  <button
+    type="button"
+    color="warn"
+    mat-raised-button
+    (click)="onDeleteFood()"
+    *ngIf="isEditMode"
+    class="submit-button"
+  >
     Xóa
   </button>
-  <button type="submit" color="primary" mat-raised-button>Thêm</button>
+  <button
+    type="submit"
+    color="primary"
+    mat-raised-button
+    *ngIf="isEditMode"
+    class="submit-button"
+  >
+    Cập nhật
+  </button>
+  <button
+    type="submit"
+    color="primary"
+    mat-raised-button
+    *ngIf="!isEditMode"
+    class="submit-button"
+  >
+    Thêm
+  </button>
 </form>

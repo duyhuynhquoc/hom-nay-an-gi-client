@@ -1,34 +1,3 @@
-<!-- <div class="food-item">
-  <p-card [style]="{ width: '360px' }">
-    <ng-template pTemplate="header">
-      <div class="image-container">
-        <img
-          [src]="food.images[0]"
-          [alt]="food.foodName"
-          *ngIf="food.images.length >= 1"
-        />
-        <img
-          src="https://cdn.dribbble.com/users/1044993/screenshots/15079662/media/bddc27ef9e0a818af1be0884cd685bac.png?compress=1&resize=400x300"
-          [alt]="food.foodName"
-          *ngIf="food.images.length < 1"
-        />
-      </div>
-    </ng-template>
-    <div class="food-item__body">
-      <h1>{{ food.foodName }}</h1>
-      <p>{{ food.averagePrice }}</p>
-      <p *ngIf="food.addresses.length > 0">
-        {{ food.addresses[0].address }}, P.{{ food.addresses[0].ward }},
-        {{ food.addresses[0].district }}, {{ food.addresses[0].city }}
-      </p>
-      <p>{{ food.reviews[0] }}</p>
-      <p *ngFor="let tag of food.tags">{{ tag }}</p>
-
-      <a (click)="onEditFood()">Xem thêm...</a>
-    </div>
-  </p-card>
-</div> -->
-
 <div class="food-item">
   <div class="header">
     <div class="image-container">

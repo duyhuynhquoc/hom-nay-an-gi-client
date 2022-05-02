@@ -2,7 +2,7 @@
   display: inline-block;
   width: 300px;
   border-radius: 6px;
-  box-shadow: 3px 3px 5px 1px rgb(155, 155, 155);
+  box-shadow: 3px 3px 5px 1px rgb(190, 190, 190);
   margin: 20px;
 
   .food-name h1 {
@@ -44,6 +44,7 @@
       padding: 2px 5px;
       border-radius: 5px;
       background-color: lightgrey;
+      margin-right: 2px;
     }
 
     .detail-btn {
@@ -51,11 +52,11 @@
 
       padding-top: 10px;
       cursor: pointer;
-      color: #f28705;
+      color: #f27405;
     }
 
     .detail-btn:hover {
-      color: #734720;
+      color: #593122;
     }
   }
 }
