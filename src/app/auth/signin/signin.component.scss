@@ -1,5 +1,24 @@
 .error-message {
+  text-align: center;
   color: #ff0000;
   font-size: 0.9em;
-  margin: 5px;
+  margin-bottom: 7px;
+}
+
+h1,
+p {
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  // justify-content: center;
+  align-items: center;
+
+  mat-form-field,
+  button {
+    width: 300px;
+    // display: block;
+  }
 }

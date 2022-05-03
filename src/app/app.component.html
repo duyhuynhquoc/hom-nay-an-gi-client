@@ -1,4 +1,11 @@
 <app-header></app-header>
+<div class="modal" *ngIf="isLoading">
+  <img
+    src="../../../assets/images/frenchFriesLoading.gif"
+    alt=""
+    class="loading-spinner"
+  />
+</div>
 <div class="app">
   <router-outlet></router-outlet>
 </div>

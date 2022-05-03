@@ -26,7 +26,6 @@ export class AuthService {
 
     if (accessToken) {
       const decodedToken = helper.decodeToken(accessToken);
-      console.log(decodedToken);
 
       this.user = new User(
         decodedToken.sub,

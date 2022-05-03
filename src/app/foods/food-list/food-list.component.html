@@ -1,13 +1,11 @@
-<div>
+<div class="sign-in-remind" *ngIf="!isAuthenticated">
+  <img src="../../../assets/images/FoodCover.png" alt="" />
+  <h1>Đăng nhập để trải nghiệm nhaaa</h1>
+</div>
+<div *ngIf="isAuthenticated">
   <h3 *ngIf="isFetching">Đang tải</h3>
   <app-food-item *ngFor="let food of foods" [food]="food"></app-food-item>
-  <button
-    type="button"
-    color="primary"
-    mat-raised-button
-    (click)="onAddFood()"
-    *ngIf="isAuthenticated"
-  >
+  <button type="button" color="primary" mat-raised-button (click)="onAddFood()">
     Thêm món
   </button>
 </div>

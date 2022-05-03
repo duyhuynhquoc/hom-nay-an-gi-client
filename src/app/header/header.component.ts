@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { AppService } from '../app.service';
 import { AuthService } from '../auth/auth.service';
 import { FoodsService } from '../foods/foods.service';
 
@@ -14,7 +15,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private foodsService: FoodsService
+    private foodsService: FoodsService,
+    private appService: AppService
   ) {}
 
   ngOnInit(): void {
@@ -29,9 +31,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.userSub.unsubscribe();
   }
 
-  signOut() {
-    this.authService.signOut();
+  async signOut() {
+    this.appService.loadingOn();
+    await this.authService.signOut();
     this.userName = '';
     this.foodsService.clearFoods();
+    this.appService.loadingOff();
   }
 }

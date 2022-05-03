@@ -71,7 +71,6 @@ export class FoodsService {
     }
 
     this.foodsChanged.next(this.getFoods());
-    console.log(this.foods);
   }
 
   getFoods() {

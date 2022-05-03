@@ -1,14 +1,16 @@
 <div class="header">
   <ul>
-    <li><a routerLink="/foods">Foods</a></li>
-    <li *ngIf="userName == ''"><a routerLink="/signup">Sign up</a></li>
-    <li *ngIf="userName == ''"><a routerLink="/signin">Sign in</a></li>
+    <li><a routerLink="/foods">Món ăn</a></li>
+    <li *ngIf="userName == ''"><a routerLink="/signup">Đăng ký</a></li>
+    <li *ngIf="userName == ''"><a routerLink="/signin">Đăng nhập</a></li>
     <li *ngIf="userName !== ''">
-      <mat-icon class="user-icon">person</mat-icon>
-      <h3>{{ userName }}</h3>
+      <a>
+        <mat-icon class="user-icon">person</mat-icon>
+        {{ userName }}
+      </a>
       <ul class="subnav">
         <li *ngIf="userName !== ''">
-          <a routerLink="" (click)="signOut()">Sign out</a>
+          <a routerLink="" (click)="signOut()">Đăng xuất</a>
         </li>
       </ul>
     </li>

@@ -1,7 +1,8 @@
 .header {
-  z-index: 1;
+  font-size: 1em;
+  z-index: 2;
   background-color: #f27405;
-  height: 54px;
+  height: 45px;
   padding: 0 180px;
   box-shadow: 0 2px 5px 1px rgb(190, 190, 190);
   position: fixed;
@@ -15,22 +16,17 @@
     > li {
       display: inline-block;
       position: relative;
-      padding: 0 18px;
 
       a,
       h3 {
-        line-height: 54px;
+        display: inline-block;
+        // width: 100%;
+        line-height: 45px;
         text-decoration: none;
         color: #fff;
-        font-size: 1em;
         cursor: pointer;
-      }
-
-      h3 {
-        line-height: 54px;
-        display: inline;
-        color: #fff;
-        font-size: 1em;
+        padding: 0 18px;
+        margin: 0;
       }
     }
 
@@ -47,7 +43,6 @@
       color: #fff;
       vertical-align: middle;
       transform: translateY(-2px);
-      margin-right: 2px;
     }
 
     .subnav {
@@ -55,15 +50,13 @@
       position: absolute;
       list-style: none;
       width: 100%;
-      transform: translateX(-18px);
 
       > li {
         background-color: #fd9a44;
-        padding: 0 18px;
       }
 
       > li:hover {
-        width: 100%;
+        // width: 100%;
         background-color: #ffa454;
 
         a {

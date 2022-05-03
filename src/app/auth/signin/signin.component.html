@@ -1,7 +1,7 @@
 <h1>Đăng nhập</h1>
 <p *ngIf="error !== ''" class="error-message">{{ error }}</p>
 <form [formGroup]="signinForm" (ngSubmit)="onSubmit()">
-  <mat-form-field class="example-full-width" appearance="fill">
+  <mat-form-field class="example-full-width" appearance="fill" class="email">
     <mat-label>Email</mat-label>
     <input
       id="email"
