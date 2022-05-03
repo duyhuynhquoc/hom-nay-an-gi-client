@@ -1,5 +1,7 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+netlify.toml
+
 # Compiled output
 /dist
 /tmp
@@ -43,3 +45,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Local Netlify folder
+.netlify

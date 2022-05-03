@@ -53,19 +53,8 @@ export class AuthService {
 
     if (accessToken) localStorage.setItem('accessToken', accessToken);
 
-    // if (user) {
-    //   this.user = new User(
-    //     user.id,
-    //     user.user_metadata['userName'],
-    //     email,
-    //     '',
-    //     new Date()
-    //   );
-    //   this.userChanged.next(this.user);
-    // }
-
     this.authenticate();
-    return user;
+    return { user, error };
   }
 
   async signOut() {

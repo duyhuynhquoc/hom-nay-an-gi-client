@@ -285,7 +285,6 @@ export class FoodEditComponent implements OnInit, OnDestroy {
         tags,
         images
       );
-      console.log('Edit');
     } else {
       // Add new food mode
       await this.foodService.addFood(

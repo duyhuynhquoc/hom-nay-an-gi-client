@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SupabaseService } from 'src/app/supabase.service';
 import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.css'],
+  styleUrls: ['./signup.component.scss'],
 })
 export class SignupComponent implements OnInit {
   signupForm: FormGroup = new FormGroup({
