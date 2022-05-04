@@ -17,6 +17,7 @@ import { FoodAddress } from '../foodAddress.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SupabaseService } from 'src/app/supabase.service';
 import { Food } from '../food.model';
+import { AppService } from 'src/app/app.service';
 
 @Component({
   selector: 'app-food-edit',
@@ -73,7 +74,8 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     private foodService: FoodsService,
     private supabaseService: SupabaseService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private appService: AppService
   ) {}
 
   async ngOnInit() {
@@ -273,6 +275,7 @@ export class FoodEditComponent implements OnInit, OnDestroy {
     const { foodName, averagePrice, note, reviews, tags, images } =
       this.foodForm.value;
 
+    this.appService.loadingOn();
     if (this.isEditMode) {
       // Edit food mode
       await this.foodService.updateFood(
@@ -297,12 +300,18 @@ export class FoodEditComponent implements OnInit, OnDestroy {
         images
       );
     }
+    this.appService.loadingOff();
 
     this.router.navigate(['foods']);
   }
 
   async onDeleteFood() {
+    this.appService.loadingOn();
+
     await this.foodService.deleteFood(this.route.snapshot.params['id']);
+
+    this.appService.loadingOff();
+
     this.router.navigate(['foods']);
   }
 
