@@ -196,6 +196,21 @@
 
   <!-- [TODO] Image Upload + Image pasting area -->
 
+  <!-- <input type="file" name="food-image-input" #imageInput /> -->
+
+  <div class="drop-image-area" (paste)="onDropImage($event)" #dropImageArea>
+    Paste image here
+  </div>
+
+  <div *ngFor="let image of images; let i = index" class="image-preview">
+    <div (click)="onDeleteImage(i)" class="delete-icon">
+      <mat-icon aria-hidden="false" aria-label="Example home icon"
+        >delete</mat-icon
+      >
+    </div>
+    <img [src]="image" alt="" />
+  </div>
+
   <h3>Tag</h3>
 
   <mat-form-field class="example-chip-list" appearance="fill" class="food-tags">

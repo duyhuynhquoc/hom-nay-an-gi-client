@@ -9,6 +9,6 @@ export class Food {
     public addresses: FoodAddress[],
     public reviews: string[],
     public tags: string[],
-    public images: string[]
+    public images: any[]
   ) {}
 }

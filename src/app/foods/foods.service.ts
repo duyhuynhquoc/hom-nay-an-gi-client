@@ -239,6 +239,7 @@ export class FoodsService {
       }
       return f;
     });
+
     this.foodsChanged.next(this.getFoods());
   }
 

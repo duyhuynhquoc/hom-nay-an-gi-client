@@ -18,6 +18,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SupabaseService } from 'src/app/supabase.service';
 import { Food } from '../food.model';
 import { AppService } from 'src/app/app.service';
+import { callbackify } from 'util';
 
 @Component({
   selector: 'app-food-edit',
@@ -26,6 +27,9 @@ import { AppService } from 'src/app/app.service';
 })
 export class FoodEditComponent implements OnInit, OnDestroy {
   isEditMode = false;
+
+  @ViewChild('dropImageArea', { static: false }) dropImageArea: any;
+  @ViewChild('imageInput', { static: false }) imageInput: any;
 
   /// Each position i represents for the i-th address FormGroup
   addressControls: FormControl[] = [];
@@ -46,6 +50,8 @@ export class FoodEditComponent implements OnInit, OnDestroy {
   filterCities: Observable<any[]>[] = [];
 
   reviewCtrl: FormControl = new FormControl(null);
+
+  images: any[] = [];
 
   @ViewChild('tagInput', { static: false })
   tagInput: ElementRef<HTMLInputElement> = {} as ElementRef;
@@ -193,6 +199,12 @@ export class FoodEditComponent implements OnInit, OnDestroy {
       reviews.push(new FormControl(r));
     });
 
+    // Display food images
+
+    food.images.map((i) => {
+      this.images.push(i);
+    });
+
     let tags = new FormArray([]);
     food.tags.map((t) => {
       this.tags.push(t);
@@ -272,8 +284,11 @@ export class FoodEditComponent implements OnInit, OnDestroy {
       );
     });
 
-    const { foodName, averagePrice, note, reviews, tags, images } =
-      this.foodForm.value;
+    const { foodName, averagePrice, note, reviews, tags } = this.foodForm.value;
+
+    const images = this.images;
+
+    this.images = JSON.parse(JSON.stringify(this.images));
 
     this.appService.loadingOn();
     if (this.isEditMode) {
@@ -325,6 +340,28 @@ export class FoodEditComponent implements OnInit, OnDestroy {
 
   onDeleteReview(i: number) {
     (<FormArray>this.foodForm.get('reviews')).removeAt(i);
+  }
+
+  onDropImage(event: any) {
+    if (event.clipboardData.files.length > 0) {
+      if (event.clipboardData.files[0].type.startsWith('image/')) {
+        this.addImageFromFile(event.clipboardData.files[0], this.images);
+      }
+    }
+  }
+
+  onDeleteImage(i: number) {
+    this.images.splice(i, 1);
+  }
+
+  addImageFromFile(file: any, arr: any) {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      arr.push(reader.result);
+    };
+
+    reader.readAsDataURL(file);
   }
 
   add(event: MatChipInputEvent): void {
